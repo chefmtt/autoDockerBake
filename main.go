@@ -8,11 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/zclconf/go-cty/cty"
 )
 
 func generateDockerBakeHCL(username string, registryPrefix string, targetsDict map[string][]string) {
+
 	f := hclwrite.NewEmptyFile()
 
 	bakeFile, err := os.Create("docker-bake.hcl")
@@ -33,7 +35,8 @@ func generateDockerBakeHCL(username string, registryPrefix string, targetsDict m
 
 	groupName := fmt.Sprintf("%s-modules", registryPrefix)
 	groupBlock := f.Body().AppendNewBlock("group", []string{groupName})
-	groupBlock.Body().SetAttributeValue("targets", cty.StringVal("docker-bake"))
+
+	targets := make([]cty.Value, 0, len(targetsDict)) // Computed below
 
 	// Create targets block
 
@@ -43,12 +46,16 @@ func generateDockerBakeHCL(username string, registryPrefix string, targetsDict m
 			d := strings.Split(dockerfile, ".")
 
 			targetName := ""
+			specification := ""
 
 			if len(d) > 1 {
-				targetName = fmt.Sprintf("%s_%s", key, strings.Join(d[1:], "_"))
+				specification = strings.Join(d[1:], "-")
+				specification = "-" + specification
+				targetName = fmt.Sprintf("%s%s", key, specification)
 			} else {
 				targetName = key
 			}
+			targets = append(targets, cty.StringVal(targetName))
 
 			targetBlock := f.Body().AppendNewBlock("target", []string{targetName})
 			targetBlock.Body().SetAttributeValue("dockerfile", cty.StringVal(dockerfile))
@@ -57,11 +64,20 @@ func generateDockerBakeHCL(username string, registryPrefix string, targetsDict m
 			platforms := []cty.Value{cty.StringVal("linux/amd64"), cty.StringVal("linux/arm64/v8")}
 			targetBlock.Body().SetAttributeValue("platforms", cty.ListVal(platforms))
 
-			image := "${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-message_monitoring:${TAG}"
-			tags := []cty.Value{cty.StringVal(image)}
-			targetBlock.Body().SetAttributeValue("tags", cty.ListVal(tags))
+			// "${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-<module>:${TAG}-specification"
+			tokens := hclwrite.Tokens{
+				{Type: hclsyntax.TokenOQuote, Bytes: []byte(`"`)},
+				{Type: hclsyntax.TokenQuotedLit, Bytes: []byte("${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-")},
+				{Type: hclsyntax.TokenQuotedLit, Bytes: []byte(key)},
+				{Type: hclsyntax.TokenQuotedLit, Bytes: []byte(":${TAG}")},
+				{Type: hclsyntax.TokenQuotedLit, Bytes: []byte(specification)},
+				{Type: hclsyntax.TokenCQuote, Bytes: []byte(`"`)},
+			}
+			targetBlock.Body().SetAttributeRaw("tags", tokens)
 		}
 	}
+
+	groupBlock.Body().SetAttributeValue("targets", cty.ListVal(targets))
 
 	// Set additional attributes or blocks as needed
 
@@ -110,6 +126,7 @@ func main() {
 	modulesPath := "./modules"
 
 	targetsDict := parseModules(modulesPath)
+	fmt.Println(targetsDict)
 
 	generateDockerBakeHCL(username, registryPrefix, targetsDict)
 }

@@ -8,23 +8,23 @@ variable "TAG" {
   default = "latest"
 }
 group "prefix-modules" {
-  targets = "docker-bake"
+  targets = ["moduleA", "moduleA-debug-arm64", "moduleB-debug"]
 }
 target "moduleA" {
   dockerfile = "Dockerfile"
   context    = "./modules/message_monitoring"
   platforms  = ["linux/amd64", "linux/arm64/v8"]
-  tags       = ["$${DOCKER_USERNAME}/$${DOCKER_REGISTRY_PREFIX}-message_monitoring:$${TAG}"]
+  tags       = "${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-moduleA:${TAG}"
 }
-target "moduleA_debug_arm64" {
+target "moduleA-debug-arm64" {
   dockerfile = "Dockerfile.debug.arm64"
   context    = "./modules/message_monitoring"
   platforms  = ["linux/amd64", "linux/arm64/v8"]
-  tags       = ["$${DOCKER_USERNAME}/$${DOCKER_REGISTRY_PREFIX}-message_monitoring:$${TAG}"]
+  tags       = "${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-moduleA:${TAG}-debug-arm64"
 }
-target "moduleB" {
-  dockerfile = "Dockerfile"
+target "moduleB-debug" {
+  dockerfile = "Dockerfile.debug"
   context    = "./modules/message_monitoring"
   platforms  = ["linux/amd64", "linux/arm64/v8"]
-  tags       = ["$${DOCKER_USERNAME}/$${DOCKER_REGISTRY_PREFIX}-message_monitoring:$${TAG}"]
+  tags       = "${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-moduleB:${TAG}-debug"
 }
