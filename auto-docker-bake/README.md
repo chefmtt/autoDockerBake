@@ -3,6 +3,12 @@
 Either install Go or run the provided binary. Go binaries are (mostly) self-contained. (A majore exception would be glibc).
 Binaries can be found in the current release.
 
+Options:
+--username, Docker username
+--registry_prefix, Prefix appended to all images' name
+--modules_path, Path to explore for finding Docker Bake targets
+--log, Log level
+
 ## Install Go
 
 ```bash
