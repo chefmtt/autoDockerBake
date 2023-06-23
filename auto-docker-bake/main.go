@@ -29,7 +29,7 @@ func generateDockerBakeHCL(username string, registryPrefix string, targetsStruct
 
 	f := hclwrite.NewEmptyFile()
 
-	bakeFile, err := os.Create("out/docker-bake.hcl")
+	bakeFile, err := os.Create("docker-bake.hcl")
 	if err != nil {
 		fmt.Println(err)
 		return
