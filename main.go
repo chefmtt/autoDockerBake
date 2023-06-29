@@ -67,11 +67,13 @@ func generateDockerBakeHCL(username string, registryPrefix string, targetsStruct
 		if target.dockerfilePurpose != "" {
 			tag = tag + "-" + target.dockerfilePurpose
 		}
-		image := "${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-" + target.module + tag
+		image := "${DOCKER_USERNAME}/${DOCKER_REGISTRY_PREFIX}-" + strings.ToLower(target.module) + tag
 		tokens := hclwrite.Tokens{
+			{Type: hclsyntax.TokenOBrack, Bytes: []byte(`[`)},
 			{Type: hclsyntax.TokenOQuote, Bytes: []byte(`"`)},
 			{Type: hclsyntax.TokenQuotedLit, Bytes: []byte(image)},
 			{Type: hclsyntax.TokenCQuote, Bytes: []byte(`"`)},
+			{Type: hclsyntax.TokenCBrack, Bytes: []byte(`]`)},
 		}
 		targetBlock.Body().SetAttributeRaw("tags", tokens)
 
