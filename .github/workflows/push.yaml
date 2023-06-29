@@ -11,11 +11,11 @@ jobs:
     runs-on: 'ubuntu-22.04'
     strategy:
       matrix:
-        goosarch:
-          - linux/amd64
-          - windows/amd64
-          - darwin/amd64
-          - darwin/arm64
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goos: windows
+            goarch: arm64
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -25,10 +25,7 @@ jobs:
           go-version-file: 'go.mod'
       - name: build
         env:
-          GOOSARCH: ${{ matrix.goosarch }}
-          GOOS: ${{ env.GOOSARCH }}%/*
-          GOARCH: ${{ env.GOOSARCH }}#*/
-          BINARY_NAME: ${{ github.event.repository.name }}-$GOOS-$GOARCH
+          BINARY_NAME: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}
         run: |
           go build -o "${{ env.BINARY_NAME }}" -v
       - name: release
