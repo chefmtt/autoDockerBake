@@ -26,7 +26,6 @@ jobs:
       - name: build
         env:
           BINARY_NAME: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}
-          TAG: $(git rev-parse --short HEAD)
           GOARCH: ${{ matrix.goarch }}
           GOOS: ${{ matrix.goos }}
         run: |
@@ -37,4 +36,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
             files: ${{ env.BINARY_NAME }}
-            tag_name: $TAG
+            tag_name: ${{ env.TAG }}
