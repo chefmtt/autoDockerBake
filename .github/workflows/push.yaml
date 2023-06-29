@@ -16,8 +16,8 @@ jobs:
         exclude:
           - goos: windows
             goarch: arm64
-      env:
-        BINARY_NAME: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}
+    env:
+      BINARY_NAME: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
