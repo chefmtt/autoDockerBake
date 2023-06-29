@@ -1,0 +1,37 @@
+name: Build and release Go binary
+run-name: Binary is being compiled
+on:
+  push:
+    branches:
+      - 'main'
+      - 'dev'
+jobs:
+  release:
+    name: Create release binary
+    runs-on: 'ubuntu-22.04'
+    strategy:
+      matrix:
+        goosarch:
+          - linux/amd64
+          - windows/amd64
+          - darwin/amd64
+          - darwin/arm64
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+      - name: build
+        env:
+          GOOSARCH: ${{ matrix.goosarch }}
+          GOOS: ${{ env.GOOSARCH%/* }}
+          GOARCH: ${{ env.GOOSARCH#*/ }}
+          BINARY_NAME: ${{github:repository}}-$GOOS-$GOARCH
+        run: |
+          go build -o "${{ env.BINARY_NAME }}" -v
+      - name: release
+        uses: softprops/action-gh-release@v1
+        with:
+            files: ${{ env.BINARY_NAME }}

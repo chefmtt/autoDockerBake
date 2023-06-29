@@ -1,0 +1,7 @@
+- id: autoDockerBake
+  name: autoDockerBake
+  entry: ./autoDockerBake .
+  types: dockerfile
+  language: system
+  description: "Auto geenrate a docker-bake.hcl file"
+# https://github.com/chefmtt/autoDockerBake/releases/latest/download/autoDockerBake-linux-amd64
