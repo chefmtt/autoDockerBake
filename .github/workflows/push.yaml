@@ -16,6 +16,8 @@ jobs:
         exclude:
           - goos: windows
             goarch: arm64
+      env:
+        BINARY_NAME: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -25,7 +27,6 @@ jobs:
           go-version-file: 'go.mod'
       - name: build
         env:
-          BINARY_NAME: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}
           GOARCH: ${{ matrix.goarch }}
           GOOS: ${{ matrix.goos }}
         run: |
@@ -35,5 +36,5 @@ jobs:
       - name: release
         uses: softprops/action-gh-release@v1
         with:
-            files: ${{ github.workspace }}/${{ env.BINARY_NAME }}
+            files: ${{ env.BINARY_NAME }}
             tag_name: ${{ env.TAG }}
