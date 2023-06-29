@@ -28,7 +28,7 @@ jobs:
           GOOSARCH: ${{ matrix.goosarch }}
           GOOS: ${{ env.GOOSARCH }}%/*
           GOARCH: ${{ env.GOOSARCH }}#*/
-          BINARY_NAME: ${{github:repository}}-$GOOS-$GOARCH
+          BINARY_NAME: ${{ github.event.repository.name }}-$GOOS-$GOARCH
         run: |
           go build -o "${{ env.BINARY_NAME }}" -v
       - name: release
