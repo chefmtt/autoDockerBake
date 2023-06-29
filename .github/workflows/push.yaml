@@ -35,5 +35,5 @@ jobs:
       - name: release
         uses: softprops/action-gh-release@v1
         with:
-            files: ${{ env.BINARY_NAME }}
+            files: ${{ github.workspace }}/${{ env.BINARY_NAME }}
             tag_name: ${{ env.TAG }}
