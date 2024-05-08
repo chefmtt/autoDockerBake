@@ -36,6 +36,5 @@ go mod tidy # will take care of adding it to go.mod and go.sum
 
 ## To explore
 
-TODO: Simplify the script once:  
 1. Matrices are integrated to buildx for bake target (added in `v0.11.0-rc1`). See: https://github.com/docker/buildx/releases/tag/v0.11.0-rc1
-2. Buildx supports multi-outputs (to output the requirements.txt file AND the image). See: https://github.com/moby/buildkit/pull/2760
+2. Buildx supports multi-outputs (see https://github.com/moby/buildkit/issues/1555); allows to generate a requirements.txt and an image using the same container building process, for example
